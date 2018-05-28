@@ -39,7 +39,7 @@ static PTEDashboard * _sharedDashboard;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^
                   {
-                      CGRect frame = UIScreen.mainScreen.bounds;
+                      CGRect frame = UIScreen.mainScreen.applicationFrame;
                       _sharedDashboard = [[self alloc] initWithFrame:frame];
                   });
     return _sharedDashboard;
@@ -51,7 +51,8 @@ static PTEDashboard * _sharedDashboard;
     if (self)
     {
         self.windowLevel = UIWindowLevelStatusBar + 1;
-        _screenSize = [UIScreen mainScreen].bounds.size;
+        
+        _screenSize = [UIScreen mainScreen].applicationFrame.size;
         
         if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
         {
@@ -97,6 +98,9 @@ static PTEDashboard * _sharedDashboard;
 {
     self.hidden = NO;
     self.minimized = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_consoleTableView reloadData];
+    });
 }
 - (void)hide
 {
@@ -207,7 +211,7 @@ static PTEDashboard * _sharedDashboard;
 
 - (BOOL)isMaximized
 {
-    return self.bounds.size.height == _screenSize.height;
+    return self.frame.size.height == _screenSize.height;
 }
 
 - (void)setMaximized:(BOOL)maximized
@@ -217,7 +221,7 @@ static PTEDashboard * _sharedDashboard;
 
 - (BOOL)isMinimized
 {
-    return self.bounds.size.height == kMinimumHeight;
+    return self.frame.size.height == kMinimumHeight;
 }
 
 - (void)setMinimized:(BOOL)minimized
@@ -232,7 +236,7 @@ static PTEDashboard * _sharedDashboard;
     if (_screenSize.height - height < kMinimumHeight * 2.0)
     {
         // Snap to bottom
-        height = _screenSize.height;
+        height = _screenSize.height-20;
     }
     
     // Adjust layout
@@ -240,7 +244,7 @@ static PTEDashboard * _sharedDashboard;
     {
         // Not minimized
         _consoleTableView.userInteractionEnabled = YES;
-        _consoleTableView.frame = _consoleTableView.superview.bounds;
+        _consoleTableView.frame = _consoleTableView.superview.frame;
         self.frame = CGRectMake(self.frame.origin.x,
                                 self.frame.origin.y,
                                 _screenSize.width,
@@ -256,7 +260,7 @@ static PTEDashboard * _sharedDashboard;
         _consoleTableView.frame = tableFrame;
         self.frame = CGRectMake(self.frame.origin.x,
                                 self.frame.origin.y,
-                                _screenSize.width - 40.0,
+                                _screenSize.width,
                                 height);
         _consoleTableView.contentOffset = CGPointMake(0.0,
                                                       MAX(_consoleTableView.contentOffset.y,
