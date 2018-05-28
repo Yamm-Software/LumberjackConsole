@@ -59,5 +59,7 @@
 /// Add a marker object to the console.
 - (void)addMarker;
 
+- (void)updateOrScheduleTableViewUpdateInConsoleQueue;
+
 @end
 

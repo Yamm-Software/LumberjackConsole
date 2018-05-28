@@ -19,12 +19,32 @@
 //
 
 #import "PTEDashboard.h"
+#import "PTEConsoleLogger.h"
 #import <QuartzCore/QuartzCore.h>
 #import <NBUCore/NBUCore.h>
 
 #define kMinimumHeight 20.0
 
 static PTEDashboard * _sharedDashboard;
+
+@interface PTERootController : UIViewController
+@property (nonatomic, strong) IBOutlet PTEConsoleTableView *tableView;
+@end
+
+@implementation PTERootController
+
+- (BOOL)prefersStatusBarHidden
+{
+    // Fixes missing status bar.
+    return NO;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self.tableView dataSource];
+}
+
+@end
 
 @implementation PTEDashboard
 {
@@ -61,7 +81,9 @@ static PTEDashboard * _sharedDashboard;
         
         // Load Storyboard
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"LumberjackConsole" bundle:[NSBundle bundleForClass:[self class]]];
-        self.rootViewController = [storyboard instantiateInitialViewController];
+        PTERootController *vc = [storyboard instantiateInitialViewController];
+        _consoleTableView = vc.tableView;
+        self.rootViewController = vc;
 			
         // Save references
         NSArray * subviews = self.rootViewController.view.subviews;
@@ -98,9 +120,7 @@ static PTEDashboard * _sharedDashboard;
 {
     self.hidden = NO;
     self.minimized = YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [_consoleTableView reloadData];
-    });
+    [[_consoleTV logger] updateOrScheduleTableViewUpdateInConsoleQueue];
 }
 - (void)hide
 {
@@ -305,22 +325,3 @@ static PTEDashboard * _sharedDashboard;
 
 @end
 
-
-@interface PTERootController : UIViewController
-@property (nonatomic, strong) IBOutlet UITableView *tableView;
-@end
-
-@implementation PTERootController
-
-- (BOOL)prefersStatusBarHidden
-{
-    // Fixes missing status bar.
-    return NO;
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self.tableView dataSource];
-}
-
-@end

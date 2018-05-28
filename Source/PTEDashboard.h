@@ -18,6 +18,8 @@
 //  limitations under the License.
 //
 
+#import "PTEConsoleTableView.h"
+
 @class PTEConsoleLogger;
 
 /**
@@ -45,6 +47,8 @@
 
 /// Whether the dashboard is minimized.
 @property (nonatomic, getter=isMinimized)   BOOL minimized;
+
+@property (nonatomic, assign) PTEConsoleTableView *consoleTV;
 
 /// @name First Responder Actions
 
