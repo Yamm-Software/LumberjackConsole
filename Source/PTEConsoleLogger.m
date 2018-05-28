@@ -109,7 +109,7 @@
         [self->_newMessagesBuffer insertObject:logMessage
                                  atIndex:0];
 
-        // Trigger update
+        
         [self updateOrScheduleTableViewUpdateInConsoleQueue];
     });
 }
@@ -175,10 +175,6 @@
 {
     if (_updateScheduled)
         return;
-    
-    if (UIApplication.sharedApplication.applicationState == UIApplicationStateBackground) {
-        return;
-    }
     
     // Schedule?
     NSTimeInterval timeToWaitForNextUpdate = _minIntervalToUpdate + _lastUpdate.timeIntervalSinceNow;
