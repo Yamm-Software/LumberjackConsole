@@ -22,6 +22,7 @@
 #import "PTEConsoleTableView.h"
 #import "PTEDashboard.h"
 #import <NBUCore/NBUCore.h>
+#import "DDLogCustomFormatter.h"
 
 #define LOG_LEVEL 2
 
@@ -73,7 +74,7 @@
     if (self)
     {
         // Default values
-        _maxMessages = 1000;
+        _maxMessages = 3000;
         _fontSize = 13.0;
         _font = [UIFont systemFontOfSize:_fontSize];
         _lastUpdate = NSDate.date;
@@ -87,6 +88,9 @@
         _messages = [NSMutableArray arrayWithCapacity:_maxMessages];
         _newMessagesBuffer = NSMutableArray.array;
         _expandedMessages = NSMutableSet.set;
+        
+        _logFormatter = [[DDLogCustomFormatter alloc] init];
+        _shortLogFormatter = [[DDLogCustomFormatter alloc] initShort];
         
         // Register logger
         [DDLog addLogger:self];
