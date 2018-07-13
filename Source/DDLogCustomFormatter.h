@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DDLog.h"
+#import <CocoaLumberjack/CocoaLumberjack.h>
 
 @interface DDLogCustomFormatter : NSObject <DDLogFormatter> {
     int loggerCount;
