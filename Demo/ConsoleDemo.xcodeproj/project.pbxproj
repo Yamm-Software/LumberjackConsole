@@ -131,7 +131,6 @@
 				E57766D218334DF6009F3276 /* Frameworks */,
 				E57766D318334DF6009F3276 /* Resources */,
 				40BA9AA44DF489A70E584D17 /* [CP] Embed Pods Frameworks */,
-				54B63CD09D8F9ADB4BC2DBEE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -150,6 +149,11 @@
 			attributes = {
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					E57766D418334DF6009F3276 = {
+						DevelopmentTeam = LC489JD2L3;
+					};
+				};
 			};
 			buildConfigurationList = E57766D018334DF6009F3276 /* Build configuration list for PBXProject "ConsoleDemo" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -203,21 +207,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ConsoleDemo/Pods-ConsoleDemo-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		54B63CD09D8F9ADB4BC2DBEE /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ConsoleDemo/Pods-ConsoleDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C796EE359A5361802B91B22D /* [CP] Check Pods Manifest.lock */ = {
@@ -378,6 +367,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = LC489JD2L3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ConsoleDemo/ConsoleDemo-Prefix.pch";
 				INFOPLIST_FILE = "ConsoleDemo/ConsoleDemo-Info.plist";
@@ -393,6 +383,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = LC489JD2L3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ConsoleDemo/ConsoleDemo-Prefix.pch";
 				INFOPLIST_FILE = "ConsoleDemo/ConsoleDemo-Info.plist";

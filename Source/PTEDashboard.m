@@ -33,6 +33,10 @@ static PTEDashboard * _sharedDashboard;
 
 @implementation PTERootController
 
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
 - (BOOL)prefersStatusBarHidden
 {
     // Fixes missing status bar.
@@ -91,21 +95,21 @@ static PTEDashboard * _sharedDashboard;
         _fullscreenOnlyViews = @[subviews[2], subviews[3], subviews[4]];
         
         // Add a pan gesture recognizer for the toggle button
-        UIPanGestureRecognizer * panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
-                                                                                         action:@selector(handlePanGesture:)];
+        UIPanGestureRecognizer * panRecognizer = [[UIPanGestureRecognizer alloc]
+                                                  initWithTarget:self
+                                                  action:@selector(handlePanGesture:)];
         [subviews[1] addGestureRecognizer:panRecognizer];
         
         // Configure other window properties
-        //    self.layer.anchorPoint = CGPointZero;
-        //    self.windowLevel = UIWindowLevelStatusBar + 1;
-        //    self.origin = CGPointZero;
-        //    self.frame = [UIScreen mainScreen].bounds;
+//        self.layer.anchorPoint = CGPointZero;
+//        self.windowLevel = UIWindowLevelStatusBar + 1;
+//        self.frame = UIScreen.mainScreen.applicationFrame;
         
         // Listen to orientation changes
-        //    [[NSNotificationCenter defaultCenter] addObserver:self
-        //                                             selector:@selector(handleStatusBarOrientationChange:)
-        //                                                 name:UIApplicationWillChangeStatusBarOrientationNotification
-        //                                               object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(handleStatusBarOrientationChange:)
+                                                         name:UIDeviceOrientationDidChangeNotification
+                                                       object:nil];
     }
     return self;
 }
@@ -122,6 +126,7 @@ static PTEDashboard * _sharedDashboard;
     self.minimized = YES;
     [[_consoleTV logger] updateOrScheduleTableViewUpdateInConsoleQueue];
 }
+
 - (void)hide
 {
     self.hidden = YES;
@@ -130,51 +135,14 @@ static PTEDashboard * _sharedDashboard;
 
 - (void)handleStatusBarOrientationChange:(NSNotification *)notification
 {
-    UIApplication * app = [UIApplication sharedApplication];
-    UIInterfaceOrientation currentOrientation = app.statusBarOrientation;
-    UIInterfaceOrientation nextOrientation = [notification.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
-    
-    // Flip the window's height and width?
-    CGRect frame = self.frame;
-    if ((UIInterfaceOrientationIsLandscape(currentOrientation) && UIInterfaceOrientationIsPortrait(nextOrientation)) ||
-        (UIInterfaceOrientationIsPortrait(currentOrientation) && UIInterfaceOrientationIsLandscape(nextOrientation)))
-    {
-        frame.size = CGSizeMake(frame.size.height,frame.size.width);
-    }
-	
-    // Calculate the transform and origin
-    CGAffineTransform transform;
-    switch (nextOrientation)
-    {
-        case UIInterfaceOrientationLandscapeLeft:
-            frame.origin = CGPointMake(0.0, _screenSize.height);
-            transform = CGAffineTransformMakeRotation(- M_PI / 2.0);
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            frame.origin = CGPointMake(_screenSize.width, 0.0);
-            transform = CGAffineTransformMakeRotation(M_PI / 2.0);
-            break;
-        case UIInterfaceOrientationPortraitUpsideDown:
-            frame.origin = CGPointMake(_screenSize.width, _screenSize.height);
-            transform = CGAffineTransformMakeRotation(M_PI);
-            break;
-        default:
-            frame.origin = CGPointZero;
-            transform = CGAffineTransformIdentity;
-            break;
-    }
-    
-    //    NSLog(@"+++ %@ %@ -> %@ %@", NSStringFromCGRect(self.frame), NSStringFromCGAffineTransform(self.transform),
-    //          NSStringFromCGRect(frame), NSStringFromCGAffineTransform(transform));
-    
-    // Animate
-    CGFloat duration = [UIApplication sharedApplication].statusBarOrientationAnimationDuration;
-    [UIView animateWithDuration:duration
-                     animations:^
-     {
-         self.transform = transform;
-         self.frame = frame;
-     }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.isMaximized) {
+            [self setMaximized:YES];
+        }
+        else {
+            [self setMinimized:YES];
+        }
+    });
 }
 
 - (IBAction)toggleFullscreen:(UIButton *)sender
@@ -251,40 +219,36 @@ static PTEDashboard * _sharedDashboard;
 
 - (void)setWindowHeight:(CGFloat)height
 {
+    
+    _screenSize = [UIScreen mainScreen].applicationFrame.size;
+    CGRect applicationFrame = [UIScreen mainScreen].applicationFrame;
+    
     // Validate height
     height = MAX(kMinimumHeight, height);
     if (_screenSize.height - height < kMinimumHeight * 2.0)
     {
         // Snap to bottom
-        height = _screenSize.height-20;
+//        height = _screenSize.height-20;
     }
     
-    // Adjust layout
-    if (height != kMinimumHeight)
-    {
-        // Not minimized
-        _consoleTableView.userInteractionEnabled = YES;
-        _consoleTableView.frame = _consoleTableView.superview.frame;
-        self.frame = CGRectMake(self.frame.origin.x,
-                                self.frame.origin.y,
-                                _screenSize.width,
-                                height);
-    }
-    else
-    {
-        // Minimized
-        _consoleTableView.userInteractionEnabled = NO;
-        CGRect tableFrame = _consoleTableView.superview.bounds;
-        tableFrame.origin.x += 20.0;
+    if (height == kMinimumHeight) {
+        CGRect tableFrame = _consoleTableView.superview.frame;
+//        tableFrame.origin.x += 20.0;
         tableFrame.size.width -= 20.0;
         _consoleTableView.frame = tableFrame;
-        self.frame = CGRectMake(self.frame.origin.x,
-                                self.frame.origin.y,
+        self.frame = CGRectMake(applicationFrame.origin.x,
+                                applicationFrame.origin.y,
                                 _screenSize.width,
                                 height);
         _consoleTableView.contentOffset = CGPointMake(0.0,
                                                       MAX(_consoleTableView.contentOffset.y,
                                                           _consoleTableView.tableHeaderView.bounds.size.height));
+    }
+    else {
+        // MAXIMIZED
+        _consoleTableView.userInteractionEnabled = YES;
+        _consoleTableView.frame = _consoleTableView.superview.frame;
+        self.frame = applicationFrame;
     }
     
     // Change keyWindow to enable keyboard input
@@ -307,7 +271,7 @@ static PTEDashboard * _sharedDashboard;
     }
     else
     {
-        // Not maximized
+        // Minimized
         if (_keyWindow)
         {
             [_keyWindow makeKeyWindow];

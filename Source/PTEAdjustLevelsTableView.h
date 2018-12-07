@@ -25,7 +25,7 @@
  
  @note Enabled only when NBULog is present.
  */
-@interface PTEAdjustLevelsTableView : UITableView
+@interface PTEAdjustLevelsTableView : UITableView <UITableViewDelegate, UITableViewDataSource>
 
 ///@name Actions
 

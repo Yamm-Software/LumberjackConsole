@@ -29,8 +29,7 @@
 #ifndef PRODUCTION
     // Add the console dashboard for testing builds
     [PTEDashboard.sharedDashboard show];
-    
-    DDLogInfo(@"Added console dashboard");
+//    DDLogInfo(@"Added console dashboard");
 #endif
     
     return YES;

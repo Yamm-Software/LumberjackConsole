@@ -23,11 +23,6 @@
 #import "PTEAdjustLevelsTableView.h"
 #import <NBULog/NBULogContextDescription.h>
 
-// Class extension
-@interface PTEAdjustLevelsTableView () <UITableViewDelegate, UITableViewDataSource>
-
-@end
-
 @implementation PTEAdjustLevelsTableView
 {
     NSArray * _orderedContexts;

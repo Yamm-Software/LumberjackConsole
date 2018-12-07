@@ -13,9 +13,14 @@ PODS:
 DEPENDENCIES:
   - LumberjackConsole (from `../`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - CocoaLumberjack
+    - NBUCore
+
 EXTERNAL SOURCES:
   LumberjackConsole:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
   CocoaLumberjack: db7cc9e464771f12054c22ff6947c5a58d43a0fd
@@ -24,4 +29,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 39b336eed97bf01478a44c2d0bc9864b93132fda
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.3
