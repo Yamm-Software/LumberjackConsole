@@ -255,6 +255,11 @@
     // Update table view (dispatch sync to ensure the messages' arrayt doesn't get modified)
     dispatch_sync(dispatch_get_main_queue(), ^
                   {
+                      
+                      if ([UIApplication.sharedApplication applicationState] == UIApplicationStateBackground) {
+                          return;
+                      }
+                      
                       // Completely update table view?
                       if (itemsToKeepCount == 0 || forceReload)
                       {
