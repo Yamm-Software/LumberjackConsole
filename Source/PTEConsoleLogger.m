@@ -56,6 +56,7 @@
 
     // Filtering messages
     BOOL _filteringEnabled;
+    BOOL _backgrounded;
     NSString * _currentSearchText;
     NSInteger _currentLogLevel;
     NSMutableArray * _filteredMessages;
@@ -82,7 +83,7 @@
         _currentLogLevel = DDLogLevelVerbose;
         
         // Init queue
-        _consoleQueue = dispatch_queue_create("console_queue", NULL);
+        _consoleQueue = dispatch_queue_create("console_queue", DISPATCH_QUEUE_SERIAL);
         
         // Init message arrays and sets
         _messages = [NSMutableArray arrayWithCapacity:_maxMessages];
@@ -103,7 +104,7 @@
 - (void)logMessage:(DDLogMessage *)logMessage
 {
     // The method is called from the logger queue
-    dispatch_async(_consoleQueue, ^
+    dispatch_barrier_async(_consoleQueue, ^
     {
         // Add new message to buffer
         [self->_newMessagesBuffer insertObject:logMessage
@@ -252,27 +253,29 @@
     // Empty buffer
     [_newMessagesBuffer removeAllObjects];
     
-    // Update table view (dispatch sync to ensure the messages' arrayt doesn't get modified)
-    dispatch_sync(dispatch_get_main_queue(), ^
-                  {
-                      
-                      if ([UIApplication.sharedApplication applicationState] == UIApplicationStateBackground) {
-                          return;
-                      }
-                      
-                      // Completely update table view?
-                      if (itemsToKeepCount == 0 || forceReload)
-                      {
-                          [self.tableView reloadData];
-                          
-                      }
-                      // Partial only
-                      else
-                      {
-                          [self updateTableViewRowsRemoving:itemsToRemoveCount
-                                                  inserting:itemsToInsertCount];
-                      }
-                  });
+    // Update table view (dispatch sync to ensure the messages' array doesn't get modified)
+    dispatch_barrier_async(dispatch_get_main_queue(), ^
+                          {
+        
+        if (PTEDashboard.sharedDashboard.isHidden) {
+            NSLogDebug(@"Console is hidden, not updating the table view");
+            self->_backgrounded = YES;
+            return;
+        }
+        
+        // Completely update table view?
+        if (itemsToKeepCount == 0 || forceReload || self->_backgrounded)
+        {
+            [self.tableView reloadData];
+            self->_backgrounded = NO;
+        }
+        // Partial only
+        else
+        {
+            [self updateTableViewRowsRemoving:itemsToRemoveCount
+                                    inserting:itemsToInsertCount];
+        }
+    });
 }
 
 - (void)updateTableViewRowsRemoving:(NSInteger)itemsToRemoveCount
